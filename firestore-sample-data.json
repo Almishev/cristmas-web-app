@@ -1,0 +1,92 @@
+{
+  "toys": [
+    {
+      "id": "toy1",
+      "name": "Teddy Bear",
+      "category": "Plush",
+      "difficulty": "Easy",
+      "inStock": true
+    },
+    {
+      "id": "toy2",
+      "name": "RC Car",
+      "category": "Electronics",
+      "difficulty": "Medium",
+      "inStock": true
+    },
+    {
+      "id": "toy3",
+      "name": "Puzzle 1000",
+      "category": "Games",
+      "difficulty": "Hard",
+      "inStock": false
+    },
+    {
+      "id": "toy4",
+      "name": "Doll House",
+      "category": "Toys",
+      "difficulty": "Medium",
+      "inStock": true
+    },
+    {
+      "id": "toy5",
+      "name": "Lego Set",
+      "category": "Building",
+      "difficulty": "Easy",
+      "inStock": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "order1",
+      "childName": "Alice",
+      "country": "USA",
+      "toyId": "toy1",
+      "priority": "High",
+      "status": "Pending"
+    },
+    {
+      "id": "order2",
+      "childName": "Bob",
+      "country": "UK",
+      "toyId": "toy2",
+      "priority": "Normal",
+      "status": "Packed"
+    },
+    {
+      "id": "order3",
+      "childName": "Charlie",
+      "country": "Canada",
+      "toyId": "toy3",
+      "priority": "Low",
+      "status": "Shipped"
+    }
+  ],
+  "elves": [
+    {
+      "id": "elf1",
+      "name": "Buddy",
+      "role": "Toy Maker",
+      "energy": 85
+    },
+    {
+      "id": "elf2",
+      "name": "Sparkle",
+      "role": "Quality Control",
+      "energy": 70
+    },
+    {
+      "id": "elf3",
+      "name": "Jingle",
+      "role": "Packaging",
+      "energy": 60
+    },
+    {
+      "id": "elf4",
+      "name": "Twinkle",
+      "role": "Delivery",
+      "energy": 90
+    }
+  ]
+}
+
