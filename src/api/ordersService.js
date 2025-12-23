@@ -1,6 +1,8 @@
 import { 
   collection, 
   getDocs, 
+  query,
+  where,
   doc,
   getDoc,
   addDoc,
@@ -11,10 +13,29 @@ import {
 import { db } from './firebase'
 
 export const ordersService = {
-  getAll: async () => {
+  getAll: async (userId = null, isAdmin = false, sessionId = null) => {
     try {
       const ordersCollection = collection(db, 'orders')
-      const ordersSnapshot = await getDocs(ordersCollection)
+      let ordersQuery
+      
+      // Ако е admin, взимаме всички поръчки
+      if (isAdmin) {
+        ordersQuery = ordersCollection
+      } 
+      // Ако има userId (логнат потребител), филтрираме само неговите поръчки
+      else if (userId) {
+        ordersQuery = query(ordersCollection, where('userId', '==', userId))
+      }
+      // Ако има sessionId (нелогнат потребител), филтрираме по sessionId
+      else if (sessionId) {
+        ordersQuery = query(ordersCollection, where('sessionId', '==', sessionId))
+      }
+      // Ако няма нищо, взимаме всички (за нелогнати без session)
+      else {
+        ordersQuery = ordersCollection
+      }
+      
+      const ordersSnapshot = await getDocs(ordersQuery)
       const orders = ordersSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -45,11 +66,13 @@ export const ordersService = {
     }
   },
 
-  create: async (orderData) => {
+  create: async (orderData, userId = null, sessionId = null) => {
     try {
       const ordersCollection = collection(db, 'orders')
       const newOrder = {
         ...orderData,
+        userId: userId || null, // userId за логнати потребители
+        sessionId: sessionId || null, // sessionId за нелогнати потребители
         status: 'Pending',
         createdAt: serverTimestamp()
       }

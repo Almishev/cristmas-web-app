@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { elvesService } from '../api/elvesService'
 import { useData } from '../context/DataContext'
+import { useAuth } from '../context/AuthContext'
 
 const ElfProfilePage = () => {
   const { elfId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
   const { elves } = useData()
+  const { isAdmin } = useAuth()
   const [elf, setElf] = useState(null)
   const [energy, setEnergy] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -93,21 +95,23 @@ const ElfProfilePage = () => {
           </div>
         </div>
         
-        <div className="flex gap-4">
-          <button 
-            onClick={() => navigate(`/elves/${elfId}/edit`)}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Edit Elf
-          </button>
-          <button 
-            onClick={handleBoostEnergy}
-            disabled={energy >= 100}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            Boost Energy (+10)
-          </button>
-        </div>
+        {isAdmin() && (
+          <div className="flex gap-4">
+            <button 
+              onClick={() => navigate(`/elves/${elfId}/edit`)}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              Edit Elf
+            </button>
+            <button 
+              onClick={handleBoostEnergy}
+              disabled={energy >= 100}
+              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              Boost Energy (+10)
+            </button>
+          </div>
+        )}
 
         <nav className="mt-6 flex gap-4 border-b border-gray-200 dark:border-gray-700">
           <Link 

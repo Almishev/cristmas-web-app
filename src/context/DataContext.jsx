@@ -2,6 +2,10 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { toysService } from '../api/toysService'
 import { ordersService } from '../api/ordersService'
 import { elvesService } from '../api/elvesService'
+import { auth, db } from '../api/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { getSessionId } from '../utils/sessionStorage'
+import { doc, getDoc } from 'firebase/firestore'
 
 const DataContext = createContext()
 
@@ -11,6 +15,8 @@ export const DataProvider = ({ children }) => {
   const [elves, setElves] = useState([])
   const [loading, setLoading] = useState({ toys: true, orders: true, elves: true })
   const [error, setError] = useState({ toys: null, orders: null, elves: null })
+  const [currentUser, setCurrentUser] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const fetchToys = async () => {
@@ -30,12 +36,39 @@ export const DataProvider = ({ children }) => {
   }, [])
 
   
+  // Слушаме за промени в authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user)
+      if (user) {
+        // Зареждаме ролята на потребителя
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid))
+          if (userDoc.exists()) {
+            setIsAdmin(userDoc.data().role === 'admin')
+          } else {
+            setIsAdmin(false)
+          }
+        } catch (err) {
+          console.error('Error loading user role:', err)
+          setIsAdmin(false)
+        }
+      } else {
+        setIsAdmin(false)
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(prev => ({ ...prev, orders: true }))
       setError(prev => ({ ...prev, orders: null }))
       try {
-        const data = await ordersService.getAll()
+        // Ако има логнат потребител, използваме userId, иначе sessionId
+        const userId = currentUser?.uid || null
+        const sessionId = currentUser ? null : getSessionId()
+        const data = await ordersService.getAll(userId, isAdmin, sessionId)
         setOrders(data)
       } catch (err) {
         setError(prev => ({ ...prev, orders: err.message }))
@@ -45,7 +78,7 @@ export const DataProvider = ({ children }) => {
       }
     }
     fetchOrders()
-  }, [])
+  }, [currentUser, isAdmin])
 
   
   useEffect(() => {
@@ -81,7 +114,10 @@ export const DataProvider = ({ children }) => {
   const refreshOrders = async () => {
     setLoading(prev => ({ ...prev, orders: true }))
     try {
-      const data = await ordersService.getAll()
+      // Ако има логнат потребител, използваме userId, иначе sessionId
+      const userId = currentUser?.uid || null
+      const sessionId = currentUser ? null : getSessionId()
+      const data = await ordersService.getAll(userId, isAdmin, sessionId)
       setOrders(data)
     } catch (err) {
       setError(prev => ({ ...prev, orders: err.message }))

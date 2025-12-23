@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to get user role
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data, admins can read all
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Users can create their own document during registration
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Users can update their own data, admins can update all
+      allow update: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+    
+    // Toys collection
+    match /toys/{toyId} {
+      // Everyone can read (public information - no authentication required)
+      allow read: if true;
+      // Everyone can create (no authentication required)
+      allow create: if true;
+      // Only admins can update and delete
+      allow update, delete: if isAdmin();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Everyone can read orders (public information)
+      allow read: if true;
+      // Everyone can create orders (no authentication required)
+      allow create: if true;
+      // Only admins can update and delete
+      allow update, delete: if isAdmin();
+    }
+    
+    // Elves collection
+    match /elves/{elfId} {
+      // Everyone can read (public information - no authentication required)
+      allow read: if true;
+      // Only admins can create, update, and delete
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
+

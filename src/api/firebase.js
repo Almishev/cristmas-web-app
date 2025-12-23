@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
 
 // Firebase конфигурация
 const firebaseConfig = {
@@ -16,5 +17,8 @@ const app = initializeApp(firebaseConfig)
 
 // Инициализиране на Firestore
 export const db = getFirestore(app)
+
+// Инициализиране на Authentication
+export const auth = getAuth(app)
 
 export default app

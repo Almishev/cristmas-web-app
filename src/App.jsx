@@ -1,8 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
+import { AuthProvider } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import Layout from './components/common/Layout'
+import ProtectedRoute from './components/common/ProtectedRoute'
 import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import ToysPage from './pages/ToysPage'
 import ToyDetailsPage from './pages/ToyDetailsPage'
 import NewToyPage from './pages/NewToyPage'
@@ -20,29 +24,31 @@ import './App.css'
 function App() {
   return (
     <ThemeProvider>
-      <DataProvider>
-        <ErrorBoundary>
-          <BrowserRouter>
-            <Layout>
+      <AuthProvider>
+        <DataProvider>
+          <ErrorBoundary>
+            <BrowserRouter>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/toys" element={<ToysPage />} />
-                <Route path="/toys/new" element={<NewToyPage />} />
-                <Route path="/toys/:toyId" element={<ToyDetailsPage />} />
-                <Route path="/toys/:toyId/edit" element={<EditToyPage />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/orders/new" element={<NewOrderPage />} />
-                <Route path="/orders/:orderId/edit" element={<EditOrderPage />} />
-                <Route path="/elves" element={<ElvesPage />} />
-                <Route path="/elves/new" element={<NewElfPage />} />
-                <Route path="/elves/:elfId" element={<ElfProfilePage />} />
-                <Route path="/elves/:elfId/edit" element={<EditElfPage />} />
-                <Route path="/elves/:elfId/tasks" element={<ElfProfilePage />} />
+                <Route path="/login" element={<Layout><LoginPage /></Layout>} />
+                <Route path="/register" element={<Layout><RegisterPage /></Layout>} />
+                <Route path="/" element={<Layout><HomePage /></Layout>} />
+                <Route path="/toys" element={<Layout><ToysPage /></Layout>} />
+                <Route path="/toys/new" element={<Layout><NewToyPage /></Layout>} />
+                <Route path="/toys/:toyId" element={<Layout><ToyDetailsPage /></Layout>} />
+                <Route path="/toys/:toyId/edit" element={<Layout><ProtectedRoute requireAdmin><EditToyPage /></ProtectedRoute></Layout>} />
+                <Route path="/orders" element={<Layout><OrdersPage /></Layout>} />
+                <Route path="/orders/new" element={<Layout><NewOrderPage /></Layout>} />
+                <Route path="/orders/:orderId/edit" element={<Layout><ProtectedRoute requireAdmin><EditOrderPage /></ProtectedRoute></Layout>} />
+                <Route path="/elves" element={<Layout><ElvesPage /></Layout>} />
+                <Route path="/elves/new" element={<Layout><ProtectedRoute requireAdmin><NewElfPage /></ProtectedRoute></Layout>} />
+                <Route path="/elves/:elfId" element={<Layout><ElfProfilePage /></Layout>} />
+                <Route path="/elves/:elfId/edit" element={<Layout><ProtectedRoute requireAdmin><EditElfPage /></ProtectedRoute></Layout>} />
+                <Route path="/elves/:elfId/tasks" element={<Layout><ElfProfilePage /></Layout>} />
               </Routes>
-            </Layout>
-          </BrowserRouter>
-        </ErrorBoundary>
-      </DataProvider>
+            </BrowserRouter>
+          </ErrorBoundary>
+        </DataProvider>
+      </AuthProvider>
     </ThemeProvider>
   )
 }

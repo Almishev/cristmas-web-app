@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { ordersService } from '../api/ordersService'
 import { useData } from '../context/DataContext'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 import { validateOrder } from '../utils/validators'
+import { getSessionId } from '../utils/sessionStorage'
 
 const NewOrderPage = () => {
   const navigate = useNavigate()
   const { toys, refreshOrders } = useData()
   const { theme } = useTheme()
+  const { user } = useAuth()
   const [formData, setFormData] = useState({
     childName: '',
     country: '',
@@ -37,7 +40,10 @@ const NewOrderPage = () => {
 
     setSubmitting(true)
     try {
-      await ordersService.create(formData)
+      // Използваме userId ако потребителят е логнат, иначе sessionId
+      const userId = user?.uid || null
+      const sessionId = user ? null : getSessionId()
+      await ordersService.create(formData, userId, sessionId)
       await refreshOrders()
       navigate('/orders')
     } catch (error) {

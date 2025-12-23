@@ -1,11 +1,19 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
+import { useAuth } from '../../context/AuthContext'
 
 const Navigation = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
+  const { user, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/')
@@ -69,6 +77,29 @@ const Navigation = () => {
                 Elves
               </Link>
             </li>
+            {user ? (
+              <li>
+                <button 
+                  onClick={handleLogout}
+                  className="px-3 lg:px-4 py-2 rounded transition-colors hover:bg-gray-700 text-sm"
+                >
+                  Logout
+                </button>
+              </li>
+            ) : (
+              <li>
+                <Link 
+                  to="/login"
+                  className={`px-3 lg:px-4 py-2 rounded transition-colors ${
+                    isActive('/login') || isActive('/register')
+                      ? 'bg-blue-600 text-white' 
+                      : 'hover:bg-gray-700'
+                  }`}
+                >
+                  Login
+                </Link>
+              </li>
+            )}
             <li>
               <button 
                 className="px-3 lg:px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-gray-900 transition-colors text-lg lg:text-xl"
@@ -160,6 +191,33 @@ const Navigation = () => {
                 Elves
               </Link>
             </li>
+            {user ? (
+              <li>
+                <button 
+                  onClick={() => {
+                    handleLogout()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="block w-full text-left px-4 py-2 rounded transition-colors hover:bg-gray-700"
+                >
+                  Logout
+                </button>
+              </li>
+            ) : (
+              <li>
+                <Link 
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded transition-colors ${
+                    isActive('/login') || isActive('/register')
+                      ? 'bg-blue-600 text-white' 
+                      : 'hover:bg-gray-700'
+                  }`}
+                >
+                  Login
+                </Link>
+              </li>
+            )}
           </ul>
         )}
       </div>

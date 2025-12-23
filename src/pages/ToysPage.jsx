@@ -2,11 +2,13 @@ import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 import { toysService } from '../api/toysService'
 
 const ToysPage = () => {
   const { toys, loading, refreshToys } = useData()
   const { theme } = useTheme()
+  const { isAdmin, user } = useAuth()
   const navigate = useNavigate()
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [inStockFilter, setInStockFilter] = useState(false)
@@ -119,7 +121,9 @@ const ToysPage = () => {
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>Category</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>Difficulty</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>In Stock</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>Actions</th>
+                {isAdmin() && (
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>Actions</th>
+                )}
               </tr>
             </thead>
             <tbody className={`${theme === 'dark' ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'} divide-y`}>
@@ -145,31 +149,33 @@ const ToysPage = () => {
                       {toy.inStock ? 'Yes' : 'No'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => navigate(`/toys/${toy.id}/edit`)}
-                        className={`px-3 py-1 text-xs rounded transition-colors ${
-                          theme === 'dark' 
-                            ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(toy.id)}
-                        disabled={deleting === toy.id}
-                        className={`px-3 py-1 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                          theme === 'dark' 
-                            ? 'bg-red-600 text-white hover:bg-red-700' 
-                            : 'bg-red-500 text-white hover:bg-red-600'
-                        }`}
-                      >
-                        {deleting === toy.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin() && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => navigate(`/toys/${toy.id}/edit`)}
+                          className={`px-3 py-1 text-xs rounded transition-colors ${
+                            theme === 'dark' 
+                              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                              : 'bg-blue-500 text-white hover:bg-blue-600'
+                          }`}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(toy.id)}
+                          disabled={deleting === toy.id}
+                          className={`px-3 py-1 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                            theme === 'dark' 
+                              ? 'bg-red-600 text-white hover:bg-red-700' 
+                              : 'bg-red-500 text-white hover:bg-red-600'
+                          }`}
+                        >
+                          {deleting === toy.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -204,29 +210,31 @@ const ToysPage = () => {
               <p>Category: {toy.category}</p>
               <p>Difficulty: {toy.difficulty}</p>
             </div>
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={() => navigate(`/toys/${toy.id}/edit`)}
-                className={`flex-1 px-3 py-2 text-sm rounded transition-colors ${
-                  theme === 'dark' 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(toy.id)}
-                disabled={deleting === toy.id}
-                className={`flex-1 px-3 py-2 text-sm rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  theme === 'dark' 
-                    ? 'bg-red-600 text-white hover:bg-red-700' 
-                    : 'bg-red-500 text-white hover:bg-red-600'
-                }`}
-              >
-                {deleting === toy.id ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
+            {isAdmin() && (
+              <div className="flex gap-2 pt-2">
+                <button
+                  onClick={() => navigate(`/toys/${toy.id}/edit`)}
+                  className={`flex-1 px-3 py-2 text-sm rounded transition-colors ${
+                    theme === 'dark' 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(toy.id)}
+                  disabled={deleting === toy.id}
+                  className={`flex-1 px-3 py-2 text-sm rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    theme === 'dark' 
+                      ? 'bg-red-600 text-white hover:bg-red-700' 
+                      : 'bg-red-500 text-white hover:bg-red-600'
+                  }`}
+                >
+                  {deleting === toy.id ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

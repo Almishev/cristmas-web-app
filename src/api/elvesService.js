@@ -18,10 +18,13 @@ export const elvesService = {
         id: doc.id,
         ...doc.data()
       }))
+      console.log('Fetched elves:', elves.length, elves)
       return elves
     } catch (error) {
       console.error('Error fetching elves:', error)
-      throw new Error('Failed to fetch elves')
+      console.error('Error code:', error.code)
+      console.error('Error message:', error.message)
+      throw new Error(`Failed to fetch elves: ${error.message}`)
     }
   },
 
