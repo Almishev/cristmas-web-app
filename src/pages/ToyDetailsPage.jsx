@@ -108,13 +108,21 @@ const ToyDetailsPage = () => {
           </div>
         </div>
         
-        <button 
-          onClick={handleToggleStock}
-          disabled={updating}
-          className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          {updating ? 'Updating...' : `Toggle Stock (${toy.inStock ? 'Out' : 'In'})`}
-        </button>
+        <div className="mt-6 flex gap-4">
+          <button 
+            onClick={() => navigate(`/toys/${toyId}/edit`)}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Edit Toy
+          </button>
+          <button 
+            onClick={handleToggleStock}
+            disabled={updating}
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            {updating ? 'Updating...' : `Toggle Stock (${toy.inStock ? 'Out' : 'In'})`}
+          </button>
+        </div>
       </div>
     </div>
   )

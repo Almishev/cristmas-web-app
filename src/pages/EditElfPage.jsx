@@ -1,13 +1,14 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { elvesService } from '../api/elvesService'
 import { useData } from '../context/DataContext'
 import { useTheme } from '../context/ThemeContext'
 import { validateElf } from '../utils/validators'
 
-const NewElfPage = () => {
+const EditElfPage = () => {
+  const { elfId } = useParams()
   const navigate = useNavigate()
-  const { refreshElves } = useData()
+  const { elves, refreshElves } = useData()
   const { theme } = useTheme()
   const [formData, setFormData] = useState({
     name: '',
@@ -16,6 +17,36 @@ const NewElfPage = () => {
   })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadElf = async () => {
+      try {
+        const foundElf = elves.find(e => e.id === elfId)
+        if (foundElf) {
+          setFormData({
+            name: foundElf.name || '',
+            role: foundElf.role || '',
+            energy: foundElf.energy !== undefined ? foundElf.energy : 50
+          })
+          setLoading(false)
+        } else {
+          const data = await elvesService.getById(elfId)
+          setFormData({
+            name: data.name || '',
+            role: data.role || '',
+            energy: data.energy !== undefined ? data.energy : 50
+          })
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error loading elf:', error)
+        alert('Failed to load elf. Redirecting...')
+        navigate('/elves')
+      }
+    }
+    loadElf()
+  }, [elfId, elves, navigate])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -39,20 +70,28 @@ const NewElfPage = () => {
 
     setSubmitting(true)
     try {
-      await elvesService.create(formData)
+      await elvesService.update(elfId, formData)
       await refreshElves()
-      navigate('/elves')
+      navigate(`/elves/${elfId}`)
     } catch (error) {
-      console.error('Error creating elf:', error)
-      alert('Failed to create elf. Please try again.')
+      console.error('Error updating elf:', error)
+      alert('Failed to update elf. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className={`text-xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4">
-      <h1 className={`text-2xl md:text-3xl font-bold mb-4 md:mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Create New Elf</h1>
+      <h1 className={`text-2xl md:text-3xl font-bold mb-4 md:mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Edit Elf</h1>
       
       <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-4 md:p-6`}>
         <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
@@ -128,11 +167,11 @@ const NewElfPage = () => {
               disabled={submitting}
               className="w-full sm:w-auto px-4 md:px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {submitting ? 'Creating...' : 'Create Elf'}
+              {submitting ? 'Updating...' : 'Update Elf'}
             </button>
             <button
               type="button"
-              onClick={() => navigate('/elves')}
+              onClick={() => navigate(`/elves/${elfId}`)}
               className={`w-full sm:w-auto px-4 md:px-6 py-2 rounded transition-colors ${
                 theme === 'dark' 
                   ? 'bg-gray-700 text-white hover:bg-gray-600' 
@@ -148,5 +187,5 @@ const NewElfPage = () => {
   )
 }
 
-export default NewElfPage
+export default EditElfPage
 

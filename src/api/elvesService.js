@@ -3,7 +3,9 @@ import {
   getDocs, 
   doc, 
   getDoc,
-  addDoc
+  addDoc,
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -57,6 +59,37 @@ export const elvesService = {
     } catch (error) {
       console.error('Error creating elf:', error)
       throw new Error('Failed to create elf')
+    }
+  },
+
+  update: async (id, elfData) => {
+    try {
+      const elfDoc = doc(db, 'elves', id)
+      const updateData = {
+        ...elfData,
+        energy: elfData.energy !== undefined ? Math.min(Math.max(elfData.energy, 0), 100) : elfData.energy
+      }
+      await updateDoc(elfDoc, updateData)
+      
+      const updatedSnapshot = await getDoc(elfDoc)
+      return {
+        id: updatedSnapshot.id,
+        ...updatedSnapshot.data()
+      }
+    } catch (error) {
+      console.error('Error updating elf:', error)
+      throw new Error('Failed to update elf')
+    }
+  },
+
+  delete: async (id) => {
+    try {
+      const elfDoc = doc(db, 'elves', id)
+      await deleteDoc(elfDoc)
+      return true
+    } catch (error) {
+      console.error('Error deleting elf:', error)
+      throw new Error('Failed to delete elf')
     }
   }
 }

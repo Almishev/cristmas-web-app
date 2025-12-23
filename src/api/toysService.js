@@ -4,7 +4,8 @@ import {
   doc, 
   getDoc, 
   updateDoc,
-  addDoc
+  addDoc,
+  deleteDoc
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -58,6 +59,33 @@ export const toysService = {
     } catch (error) {
       console.error('Error creating toy:', error)
       throw new Error('Failed to create toy')
+    }
+  },
+
+  update: async (id, toyData) => {
+    try {
+      const toyDoc = doc(db, 'toys', id)
+      await updateDoc(toyDoc, toyData)
+      
+      const updatedSnapshot = await getDoc(toyDoc)
+      return {
+        id: updatedSnapshot.id,
+        ...updatedSnapshot.data()
+      }
+    } catch (error) {
+      console.error('Error updating toy:', error)
+      throw new Error('Failed to update toy')
+    }
+  },
+
+  delete: async (id) => {
+    try {
+      const toyDoc = doc(db, 'toys', id)
+      await deleteDoc(toyDoc)
+      return true
+    } catch (error) {
+      console.error('Error deleting toy:', error)
+      throw new Error('Failed to delete toy')
     }
   },
 

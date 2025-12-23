@@ -93,13 +93,21 @@ const ElfProfilePage = () => {
           </div>
         </div>
         
-        <button 
-          onClick={handleBoostEnergy}
-          disabled={energy >= 100}
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-        >
-          Boost Energy (+10)
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => navigate(`/elves/${elfId}/edit`)}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Edit Elf
+          </button>
+          <button 
+            onClick={handleBoostEnergy}
+            disabled={energy >= 100}
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            Boost Energy (+10)
+          </button>
+        </div>
 
         <nav className="mt-6 flex gap-4 border-b border-gray-200 dark:border-gray-700">
           <Link 

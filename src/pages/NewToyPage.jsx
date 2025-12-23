@@ -52,11 +52,11 @@ const NewToyPage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className={`text-3xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Create New Toy</h1>
+    <div className="max-w-2xl mx-auto px-4">
+      <h1 className={`text-2xl md:text-3xl font-bold mb-4 md:mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Create New Toy</h1>
       
-      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6`}>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-4 md:p-6`}>
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           <div>
             <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
               Toy Name *
@@ -128,18 +128,18 @@ const NewToyPage = () => {
             </label>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <button 
               type="submit" 
               disabled={submitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full sm:w-auto px-4 md:px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? 'Creating...' : 'Create Toy'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/toys')}
-              className={`px-6 py-2 rounded transition-colors ${
+              className={`w-full sm:w-auto px-4 md:px-6 py-2 rounded transition-colors ${
                 theme === 'dark' 
                   ? 'bg-gray-700 text-white hover:bg-gray-600' 
                   : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
